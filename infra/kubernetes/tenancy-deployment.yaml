@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tenancy-api
+  namespace: atlasbank
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tenancy-api
+  template:
+    metadata:
+      labels:
+        app: tenancy-api
+    spec:
+      containers:
+        - name: tenancy-api
+          image: atlasbank/tenancy-api:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: atlasbank-config
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: tenancy-connection-string
+            - name: Jwt__Secret
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: jwt-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tenancy-api-service
+  namespace: atlasbank
+spec:
+  selector:
+    app: tenancy-api
+  ports:
+    - port: 80
+      targetPort: 8080

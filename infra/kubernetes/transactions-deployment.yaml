@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transactions-api
+  namespace: atlasbank
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: transactions-api
+  template:
+    metadata:
+      labels:
+        app: transactions-api
+    spec:
+      containers:
+        - name: transactions-api
+          image: atlasbank/transactions-api:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: atlasbank-config
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: transactions-connection-string
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transactions-api-service
+  namespace: atlasbank
+spec:
+  selector:
+    app: transactions-api
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: LoadBalancer

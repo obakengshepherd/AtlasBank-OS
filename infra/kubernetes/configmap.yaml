@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlasbank-config
+  namespace: atlasbank
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  Kafka__BootstrapServers: "kafka-service:9092"
+  Jwt__Issuer: "AtlasBank"
+  Jwt__Audience: "AtlasBank.API"

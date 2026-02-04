@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "vKqoTZR/HJM=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\obake\\Downloads\\AtlasBank OS\\shared\\AtlasBank.Core\\AtlasBank.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\obake\\.nuget\\packages\\fluentvalidation\\11.9.0\\fluentvalidation.11.9.0.nupkg.sha512",
+    "C:\\Users\\obake\\.nuget\\packages\\mediatr\\12.2.0\\mediatr.12.2.0.nupkg.sha512",
+    "C:\\Users\\obake\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\obake\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\obake\\.nuget\\packages\\serilog\\3.1.1\\serilog.3.1.1.nupkg.sha512"
+  ],
+  "logs": []
+}
