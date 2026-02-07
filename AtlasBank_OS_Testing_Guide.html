@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AtlasBank OS — Complete Testing Guide</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --card-alt: #222636;
+    --border: #2e3345;
+    --text: #e2e4ed;
+    --muted: #7b7f9a;
+    --accent: #5b8bff;
+    --accent2: #6ee7b7;
+    --accent3: #f59e0b;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --pink: #f472b6;
+    --code-bg: #141620;
+    --phase-1: #5b8bff;
+    --phase-2: #6ee7b7;
+    --phase-3: #f59e0b;
+    --phase-4: #a78bfa;
+    --phase-5: #f472b6;
+    --phase-6: #fb923c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    background: linear-gradient(135deg, #0f1117 0%, #1a1530 40%, #111827 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 24px 50px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 400px;
+    background: radial-gradient(ellipse, rgba(91,139,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(91,139,255,0.12);
+    border: 1px solid rgba(91,139,255,0.3);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: 42px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    padding: 28px 24px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* PHASE TIMELINE NAV */
+  .phase-nav {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 28px 24px 10px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .phase-pill {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .phase-pill:hover { border-color: var(--accent); color: var(--text); }
+  .phase-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* MAIN */
+  .main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+
+  /* PHASE HEADER */
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 50px 0 20px;
+  }
+  .phase-header:first-child { margin-top: 10px; }
+  .phase-number {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .phase-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .phase-header .phase-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card-alt);
+  }
+  .card-header .step-num {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .card-header h3 {
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .card-header .tag {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+  .card-body { padding: 18px 20px; }
+
+  /* INFO TEXT */
+  .info-text { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+  .info-text strong { color: var(--text); }
+
+  /* PREREQ BOX */
+  .prereq-box {
+    background: rgba(91,139,255,0.06);
+    border: 1px solid rgba(91,139,255,0.2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .prereq-box .prereq-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .prereq-list { list-style: none; }
+  .prereq-list li {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 3px 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .prereq-list li::before {
+    content: '✓';
+    color: var(--accent2);
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  /* WARNING BOX */
+  .warning-box {
+    background: rgba(248,161,71,0.07);
+    border: 1px solid rgba(248,161,71,0.25);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .warning-box .warn-icon { font-size: 18px; flex-shrink: 0; }
+  .warning-box p { font-size: 13px; color: #fcd34d; }
+
+  /* TIP BOX */
+  .tip-box {
+    background: rgba(110,231,183,0.06);
+    border: 1px solid rgba(110,231,183,0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .tip-box .tip-icon { font-size: 18px; flex-shrink: 0; }
+  .tip-box p { font-size: 13px; color: var(--accent2); }
+
+  /* CODE BLOCKS */
+  .code-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .code-label .file-icon { font-size: 13px; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  pre code {
+    font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c9d1d9;
+    white-space: pre;
+  }
+
+  /* Syntax highlighting */
+  .kw { color: #ff7b72; } /* keywords */
+  .str { color: #a5d6ff; } /* strings */
+  .cmt { color: #484f58; font-style: italic; } /* comments */
+  .fn { color: #d2a8ff; } /* functions */
+  .var { color: #ffa657; } /* variables */
+  .op { color: #79c0ff; } /* operators */
+  .num { color: #79c0ff; } /* numbers */
+  .tag { color: #7ee787; } /* tags/commands */
+
+  /* COPY HINT */
+  .copy-hint {
+    position: absolute;
+    top: 10px; right: 12px;
+    font-size: 10px;
+    color: var(--muted);
+    font-family: sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin: 6px 0; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--text);
+    border-bottom: 1px solid rgba(46,51,69,0.5);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist .cb {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    background: var(--card-alt);
+  }
+  .checklist .cb.done { background: var(--accent2); border-color: var(--accent2); }
+  .checklist .item-text { flex: 1; }
+  .checklist .item-text small { color: var(--muted); display: block; font-size: 12px; margin-top: 1px; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 12px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead { background: var(--card-alt); }
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(46,51,69,0.4);
+    color: var(--text);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  .status-ok { color: var(--accent2); font-weight: 600; }
+  .status-warn { color: var(--accent3); font-weight: 600; }
+  .port { color: var(--accent); font-family: monospace; font-size: 13px; }
+  .url { color: var(--purple); font-family: monospace; font-size: 12px; word-break: break-all; }
+
+  /* ENDPOINT ROWS */
+  .method {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+  .method-get { background: rgba(110,231,183,0.15); color: var(--accent2); }
+  .method-post { background: rgba(91,139,255,0.15); color: var(--accent); }
+  .method-put { background: rgba(245,158,11,0.15); color: var(--accent3); }
+  .method-del { background: rgba(248,113,113,0.15); color: var(--red); }
+
+  /* FINAL SECTION */
+  .final-card {
+    background: linear-gradient(135deg, #1a1d27 0%, #1e1a2e 100%);
+    border: 1px solid rgba(91,139,255,0.25);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    margin-top: 50px;
+  }
+  .final-card h2 {
+    font-size: 26px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .final-card p { color: var(--muted); font-size: 15px; max-width: 560px; margin: 0 auto 24px; }
+  .badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+  }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 40px 0; }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 28px; }
+    .stats-bar { gap: 20px; }
+    .phase-header { flex-direction: column; text-align: center; }
+    .final-card { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🏦 AtlasBank OS</div>
+  <h1>Complete Testing Guide</h1>
+  <p>Every single step — from zero to a fully verified, production-ready core banking platform. Run these in order. Miss nothing.</p>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-number">6</div><div class="stat-label">Phases</div></div>
+  <div class="stat"><div class="stat-number">5</div><div class="stat-label">Microservices</div></div>
+  <div class="stat"><div class="stat-number">40+</div><div class="stat-label">Test Steps</div></div>
+  <div class="stat"><div class="stat-number">15</div><div class="stat-label">Endpoints</div></div>
+  <div class="stat"><div class="stat-number">1</div><div class="stat-label">Gateway</div></div>
+</div>
+
+<!-- PHASE NAV -->
+<div class="phase-nav">
+  <a href="#phase1" class="phase-pill"><span class="dot" style="background:var(--phase-1)"></span> 1 — Prerequisites</a>
+  <a href="#phase2" class="phase-pill"><span class="dot" style="background:var(--phase-2)"></span> 2 — Infrastructure</a>
+  <a href="#phase3" class="phase-pill"><span class="dot" style="background:var(--phase-3)"></span> 3 — Build &amp; Migrate</a>
+  <a href="#phase4" class="phase-pill"><span class="dot" style="background:var(--phase-4)"></span> 4 — Service Tests</a>
+  <a href="#phase5" class="phase-pill"><span class="dot" style="background:var(--phase-5)"></span> 5 — Integration</a>
+  <a href="#phase6" class="phase-pill"><span class="dot" style="background:var(--phase-6)"></span> 6 — E2E &amp; Docker</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ============================================================ PHASE 1 ============================================================ -->
+  <div id="phase1">
+    <div class="phase-header">
+      <div class="phase-number" style="background:rgba(91,139,255,0.15); color:var(--phase-1);">1</div>
+      <div><h2 style="color:var(--phase-1)">Prerequisites &amp; Environment Setup</h2><div class="phase-sub">Make sure everything is installed before you touch a single line of code</div></div>
+    </div>
+
+    <div class="prereq-box">
+      <div class="prereq-title">Required Software</div>
+      <ul class="prereq-list">
+        <li>.NET 8 SDK — <code style="color:var(--accent);font-size:12px;">.NET 8.0.x</code></li>
+        <li>Docker Desktop — Running &amp; healthy</li>
+        <li>PostgreSQL 16 — Via Docker (no local install needed)</li>
+        <li>PowerShell 7+ — <code style="color:var(--accent);font-size:12px;">pwsh --version</code></li>
+        <li>Git — For repo management</li>
+        <li>VS Code — With C# extension installed</li>
+      </ul>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(91,139,255,0.15);color:var(--phase-1);">1</div>
+        <h3>Verify .NET 8 SDK is installed</h3>
+        <span class="tag" style="background:rgba(91,139,255,0.12);color:var(--phase-1);">PowerShell</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in PowerShell</div>
+        <pre><code><span class="tag">dotnet</span> <span class="kw">--version</span></code></pre>
+        <div class="info-text">⟶ Output must show <strong>8.0.x</strong>. If not, download from <strong>dotnet.microsoft.com</strong></div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(91,139,255,0.15);color:var(--phase-1);">2</div>
+        <h3>Verify Docker is running</h3>
+        <span class="tag" style="background:rgba(91,139,255,0.12);color:var(--phase-1);">PowerShell</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in PowerShell</div>
+        <pre><code><span class="tag">docker</span> info</code></pre>
+        <div class="info-text">⟶ Must show <strong>Server: Docker Engine</strong> — not an error. Open Docker Desktop if it's not running.</div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(91,139,255,0.15);color:var(--phase-1);">3</div>
+        <h3>Navigate to the project root</h3>
+        <span class="tag" style="background:rgba(91,139,255,0.12);color:var(--phase-1);">PowerShell</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">📂</span> Set your working directory</div>
+        <pre><code><span class="tag">Set-Location</span> <span class="str">"C:\Your\Path\To\AtlasBank-OS"</span></code></pre>
+        <div class="info-text">⟶ Every command from here on assumes you are inside <strong>AtlasBank-OS/</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ PHASE 2 ============================================================ -->
+  <div id="phase2">
+    <div class="phase-header">
+      <div class="phase-number" style="background:rgba(110,231,183,0.15); color:var(--phase-2);">2</div>
+      <div><h2 style="color:var(--phase-2)">Spin Up Infrastructure</h2><div class="phase-sub">PostgreSQL, Kafka, ZooKeeper, and Redis — all via Docker</div></div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(110,231,183,0.15);color:var(--phase-2);">4</div>
+        <h3>Start all infrastructure containers</h3>
+        <span class="tag" style="background:rgba(110,231,183,0.12);color:var(--phase-2);">Docker</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🐳</span> infra/docker/</div>
+        <pre><code><span class="tag">cd</span> infra/docker
+<span class="tag">docker</span> compose <span class="kw">-f</span> docker-compose.yml <span class="kw">up</span> <span class="var">-d</span></code></pre>
+        <div class="info-text">⟶ Use the <strong>base</strong> docker-compose.yml first (not prod). The <code>-d</code> flag runs detached so your terminal stays free.</div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(110,231,183,0.15);color:var(--phase-2);">5</div>
+        <h3>Confirm every container is healthy</h3>
+        <span class="tag" style="background:rgba(110,231,183,0.12);color:var(--phase-2);">Docker</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in PowerShell</div>
+        <pre><code><span class="tag">docker</span> ps</code></pre>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Container</th><th>Image</th><th>Port</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>postgres</td><td>postgres:16-alpine</td><td class="port">5432</td><td class="status-ok">✓ Up</td></tr>
+              <tr><td>kafka</td><td>cp-kafka:7.5.0</td><td class="port">9092</td><td class="status-ok">✓ Up</td></tr>
+              <tr><td>zookeeper</td><td>cp-zookeeper:7.5.0</td><td class="port">2181</td><td class="status-ok">✓ Up</td></tr>
+              <tr><td>redis</td><td>redis:7-alpine</td><td class="port">6379</td><td class="status-ok">✓ Up</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="warning-box">
+          <span class="warn-icon">⚡</span>
+          <p>Kafka takes 10–15 seconds to fully start after the container shows "Up". Wait before testing it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(110,231,183,0.15);color:var(--phase-2);">6</div>
+        <h3>Verify PostgreSQL and the 5 databases</h3>
+        <span class="tag" style="background:rgba(110,231,183,0.12);color:var(--phase-2);">Docker</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🗄️</span> Connect into the postgres container</div>
+        <pre><code><span class="tag">docker</span> exec <span class="var">-it</span> postgres <span class="tag">psql</span> <span class="kw">-U</span> postgres <span class="kw">-c</span> <span class="str">"\l"</span></code></pre>
+        <div class="info-text">⟶ You must see all 5 databases created by <code>init-databases.sql</code>:</div>
+        <ul class="checklist" style="margin-top:8px;">
+          <li><div class="cb"></div><div class="item-text">atlasbank_accounts</div></li>
+          <li><div class="cb"></div><div class="item-text">atlasbank_transactions</div></li>
+          <li><div class="cb"></div><div class="item-text">atlasbank_products</div></li>
+          <li><div class="cb"></div><div class="item-text">atlasbank_compliance</div></li>
+          <li><div class="cb"></div><div class="item-text">atlasbank_tenancy</div></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(110,231,183,0.15);color:var(--phase-2);">7</div>
+        <h3>Ping Redis to confirm it's alive</h3>
+        <span class="tag" style="background:rgba(110,231,183,0.12);color:var(--phase-2);">Docker</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in PowerShell</div>
+        <pre><code><span class="tag">docker</span> exec <span class="var">-it</span> redis redis-cli <span class="tag">ping</span></code></pre>
+        <div class="info-text">⟶ Must return <strong style="color:var(--accent2);">PONG</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ PHASE 3 ============================================================ -->
+  <div id="phase3">
+    <div class="phase-header">
+      <div class="phase-number" style="background:rgba(245,158,11,0.15); color:var(--phase-3);">3</div>
+      <div><h2 style="color:var(--phase-3)">Build, Restore &amp; Migrate</h2><div class="phase-sub">Compile every service and push database schemas into PostgreSQL</div></div>
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">💡</span>
+      <p>Run these commands in sequence. Each service has its own database. <strong>Every single migration must succeed</strong> before moving on.</p>
+    </div>
+
+    <!-- Step 8 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(245,158,11,0.15);color:var(--phase-3);">8</div>
+        <h3>Restore &amp; migrate — Accounts Service</h3>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--phase-3);">Accounts</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">📦</span> services/accounts/AtlasBank.Accounts.API/</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\services\accounts\AtlasBank.Accounts.API"</span>
+<span class="tag">dotnet</span> restore
+<span class="tag">dotnet</span> ef migrations add <span class="str">InitialCreate</span>
+<span class="tag">dotnet</span> ef database update</code></pre>
+        <div class="info-text">⟶ Terminal must end with <strong style="color:var(--accent2);">Build succeeded</strong> and <strong style="color:var(--accent2);">1 migration(s) applied</strong></div>
+      </div>
+    </div>
+
+    <!-- Step 9 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(245,158,11,0.15);color:var(--phase-3);">9</div>
+        <h3>Restore &amp; migrate — Transactions Service</h3>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--phase-3);">Transactions</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">📦</span> services/transactions/AtlasBank.Transactions.API/</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\transactions\AtlasBank.Transactions.API"</span>
+<span class="tag">dotnet</span> restore
+<span class="tag">dotnet</span> ef migrations add <span class="str">InitialCreate</span>
+<span class="tag">dotnet</span> ef database update</code></pre>
+      </div>
+    </div>
+
+    <!-- Step 10 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(245,158,11,0.15);color:var(--phase-3);">10</div>
+        <h3>Restore &amp; migrate — Products Service</h3>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--phase-3);">Products</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">📦</span> services/products/AtlasBank.Products.API/</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\products\AtlasBank.Products.API"</span>
+<span class="tag">dotnet</span> restore
+<span class="tag">dotnet</span> ef migrations add <span class="str">InitialCreate</span>
+<span class="tag">dotnet</span> ef database update</code></pre>
+      </div>
+    </div>
+
+    <!-- Step 11 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(245,158,11,0.15);color:var(--phase-3);">11</div>
+        <h3>Restore &amp; migrate — Compliance Service</h3>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--phase-3);">Compliance</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">📦</span> services/compliance/AtlasBank.Compliance.API/</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\compliance\AtlasBank.Compliance.API"</span>
+<span class="tag">dotnet</span> restore
+<span class="tag">dotnet</span> ef migrations add <span class="str">InitialCreate</span>
+<span class="tag">dotnet</span> ef database update</code></pre>
+      </div>
+    </div>
+
+    <!-- Step 12 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(245,158,11,0.15);color:var(--phase-3);">12</div>
+        <h3>Restore &amp; migrate — Tenancy Service</h3>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--phase-3);">Tenancy</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">📦</span> services/tenancy/AtlasBank.Tenancy.API/</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\tenancy\AtlasBank.Tenancy.API"</span>
+<span class="tag">dotnet</span> restore
+<span class="tag">dotnet</span> ef migrations add <span class="str">InitialCreate</span>
+<span class="tag">dotnet</span> ef database update</code></pre>
+      </div>
+    </div>
+
+    <!-- Step 13 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(245,158,11,0.15);color:var(--phase-3);">13</div>
+        <h3>Restore the Gateway</h3>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--phase-3);">Gateway</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">📦</span> gateway/AtlasBank.Gateway/</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\..\..\gateway\AtlasBank.Gateway"</span>
+<span class="tag">dotnet</span> restore</code></pre>
+        <div class="info-text">⟶ No migrations for the gateway — it's a pure reverse proxy.</div>
+      </div>
+    </div>
+
+    <!-- Verify tables -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(245,158,11,0.15);color:var(--phase-3);">14</div>
+        <h3>Verify all tables were created in PostgreSQL</h3>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--phase-3);">Verify</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🗄️</span> Check each database</div>
+        <pre><code><span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_accounts <span class="kw">-c</span> <span class="str">"\dt"</span>
+<span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_transactions <span class="kw">-c</span> <span class="str">"\dt"</span>
+<span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_products <span class="kw">-c</span> <span class="str">"\dt"</span>
+<span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_compliance <span class="kw">-c</span> <span class="str">"\dt"</span>
+<span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_tenancy <span class="kw">-c</span> <span class="str">"\dt"</span></code></pre>
+        <div class="info-text">⟶ Each must show its corresponding table <strong>(Accounts, Transactions, Products, Loans, ComplianceChecks, Tenants, Users)</strong> plus the <code>__EFMigrationsHistory</code> table.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ PHASE 4 ============================================================ -->
+  <div id="phase4">
+    <div class="phase-header">
+      <div class="phase-number" style="background:rgba(167,139,250,0.15); color:var(--phase-4);">4</div>
+      <div><h2 style="color:var(--phase-4)">Launch &amp; Test Each Service Individually</h2><div class="phase-sub">Run each microservice, hit Swagger, and fire live HTTP requests</div></div>
+    </div>
+
+    <div class="warning-box">
+      <span class="warn-icon">⚡</span>
+      <p><strong>Open 5 separate PowerShell terminals</strong> — one per service. Each runs on its own port simultaneously. Do NOT close them.</p>
+    </div>
+
+    <!-- Step 15 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">15</div>
+        <h3>Launch all 5 services (each in its own terminal)</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">Launch</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🖥️</span> Terminal 1 — Accounts</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\AtlasBank-OS\services\accounts\AtlasBank.Accounts.API"</span>
+<span class="tag">dotnet</span> run <span class="kw">--project</span> .</code></pre>
+        <div class="code-label" style="margin-top:10px;"><span class="file-icon">🖥️</span> Terminal 2 — Transactions</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\AtlasBank-OS\services\transactions\AtlasBank.Transactions.API"</span>
+<span class="tag">dotnet</span> run <span class="kw">--project</span> .</code></pre>
+        <div class="code-label" style="margin-top:10px;"><span class="file-icon">🖥️</span> Terminal 3 — Products</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\AtlasBank-OS\services\products\AtlasBank.Products.API"</span>
+<span class="tag">dotnet</span> run <span class="kw">--project</span> .</code></pre>
+        <div class="code-label" style="margin-top:10px;"><span class="file-icon">🖥️</span> Terminal 4 — Compliance</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\AtlasBank-OS\services\compliance\AtlasBank.Compliance.API"</span>
+<span class="tag">dotnet</span> run <span class="kw">--project</span> .</code></pre>
+        <div class="code-label" style="margin-top:10px;"><span class="file-icon">🖥️</span> Terminal 5 — Tenancy</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\AtlasBank-OS\services\tenancy\AtlasBank.Tenancy.API"</span>
+<span class="tag">dotnet</span> run <span class="kw">--project</span> .</code></pre>
+        <div class="info-text" style="margin-top:10px;">⟶ Wait for each terminal to print <strong style="color:var(--accent2);">Now listening on:</strong> before proceeding.</div>
+      </div>
+    </div>
+
+    <!-- Step 16: Port map -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">16</div>
+        <h3>Confirm Swagger UI opens on each service</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">Swagger</span>
+      </div>
+      <div class="card-body">
+        <div class="info-text">Open each URL in your browser. Each must render a Swagger page with the service endpoints listed.</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Service</th><th>Swagger URL</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Accounts</td><td class="url">http://localhost:5001/swagger</td><td class="status-ok">✓ Check</td></tr>
+              <tr><td>Transactions</td><td class="url">http://localhost:5002/swagger</td><td class="status-ok">✓ Check</td></tr>
+              <tr><td>Products</td><td class="url">http://localhost:5003/swagger</td><td class="status-ok">✓ Check</td></tr>
+              <tr><td>Compliance</td><td class="url">http://localhost:5004/swagger</td><td class="status-ok">✓ Check</td></tr>
+              <tr><td>Tenancy</td><td class="url">http://localhost:5005/swagger</td><td class="status-ok">✓ Check</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <p>If the port shown in your terminal is different (e.g. a random port), use <strong>that</strong> port instead. .NET assigns one automatically in dev mode.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 17: Tenancy first -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">17</div>
+        <h3>Test: Register a User (Tenancy)</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">POST</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in a new PowerShell terminal</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5005/api/auth/register"</span> `
+  <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "tenantId": "00000000-0000-0000-0000-000000000001",
+    "email": "admin@atlasbank.com",
+    "password": "Admin@12345",
+    "firstName": "Atlas",
+    "lastName": "Admin",
+    "phone": "+27123456789",
+    "roles": ["Admin", "BankManager"]
+  }'</span></code></pre>
+        <div class="info-text">⟶ Response must contain a <strong>userId</strong> GUID. Copy it — you'll use it later.</div>
+      </div>
+    </div>
+
+    <!-- Step 18: Login -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">18</div>
+        <h3>Test: Login &amp; Grab JWT Token (Tenancy)</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">POST</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in PowerShell</div>
+        <pre><code><span class="var">$loginResponse</span> = <span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5005/api/auth/login"</span> `
+  <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "email": "admin@atlasbank.com",
+    "password": "Admin@12345"
+  }'</span>
+
+<span class="tag">Write-Host</span> <span class="str">"Token: $($loginResponse.token)"</span>
+<span class="var">$token</span> = <span class="var">$loginResponse</span>.token</code></pre>
+        <div class="info-text">⟶ You must see a long JWT string printed. The <code>$token</code> variable is now stored for the next tests.</div>
+        <div class="warning-box">
+          <span class="warn-icon">⚡</span>
+          <p>Keep this terminal open. <strong>$token</strong> is scoped to this session. All future authenticated calls must run in the same terminal.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 19: Create Tenant -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">19</div>
+        <h3>Test: Create a Tenant (Tenancy)</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">POST</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in the SAME terminal that holds $token</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5005/api/tenants"</span> `
+  <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "tenantCode": "ATLSZA",
+    "name": "AtlasBank South Africa",
+    "legalName": "AtlasBank (Pty) Ltd",
+    "registrationNumber": "2023/123456/06",
+    "country": "South Africa",
+    "primaryContact": "Atlas Admin",
+    "email": "info@atlasbank.co.za",
+    "phone": "+27112345678"
+  }'</span></code></pre>
+        <div class="info-text">⟶ Response: <strong>{ "tenantId": "..." }</strong></div>
+      </div>
+    </div>
+
+    <!-- Step 20: Create Account -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">20</div>
+        <h3>Test: Create a Bank Account (Accounts)</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">POST</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in the same terminal</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5001/api/accounts"</span> `
+  <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "customerId": "CUST-001",
+    "tenantId": "ATLSZA",
+    "productType": 1,
+    "interestRate": 3.5
+  }'</span></code></pre>
+        <div class="info-text">⟶ <code>productType: 1</code> = CurrentAccount. Response: a <strong>Guid</strong> (the account ID). Save it.</div>
+      </div>
+    </div>
+
+    <!-- Step 21: Create Transfer -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">21</div>
+        <h3>Test: Create a Transaction (Transactions)</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">POST</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in the same terminal</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5002/api/transactions"</span> `
+  <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "tenantId": "ATLSZA",
+    "sourceAccountId": "ACC-001",
+    "destinationAccountId": "ACC-002",
+    "amount": 5000.00,
+    "currency": "ZAR",
+    "description": "Initial test transfer"
+  }'</span></code></pre>
+        <div class="info-text">⟶ Response: <strong>{ "loanNumber": "TXN..." }</strong> — a unique transaction reference.</div>
+      </div>
+    </div>
+
+    <!-- Step 22: Create Product -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">22</div>
+        <h3>Test: Create a Financial Product (Products)</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">POST</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in the same terminal</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5003/api/products"</span> `
+  <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "tenantId": "ATLSZA",
+    "productCode": "SAV001",
+    "productName": "AtlasBank Premium Savings",
+    "productType": 2,
+    "description": "High-yield savings account for premium clients",
+    "interestRate": 7.5,
+    "minimumBalance": 1000,
+    "maximumBalance": 5000000,
+    "monthlyFee": 0,
+    "termMonths": 12,
+    "features": {
+      "overdraft": "false",
+      "interestCompounding": "monthly",
+      "withdrawalLimit": "3"
+    }
+  }'</span></code></pre>
+        <div class="info-text">⟶ Response: <strong>{ "value": "guid..." }</strong> — the product ID. Store this for the loan test next.</div>
+      </div>
+    </div>
+
+    <!-- Step 23: Create Loan -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">23</div>
+        <h3>Test: Apply for a Loan (Products)</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">POST</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Replace productId with the GUID you got in Step 22</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5003/api/products/loans"</span> `
+  <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "tenantId": "ATLSZA",
+    "customerId": "CUST-001",
+    "accountId": "ACC-001",
+    "productId": "PASTE-PRODUCT-GUID-HERE",
+    "amount": 50000.00,
+    "termMonths": 24
+  }'</span></code></pre>
+        <div class="info-text">⟶ Response: <strong>{ "loanNumber": "LN..." }</strong> — a unique loan reference number.</div>
+      </div>
+    </div>
+
+    <!-- Step 24: Compliance -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">24</div>
+        <h3>Test: Trigger a Compliance Check (Compliance)</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">POST</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in the same terminal</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5004/api/compliance/checks"</span> `
+  <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "tenantId": "ATLSZA",
+    "entityId": "CUST-001",
+    "entityType": "Customer",
+    "checkType": 1
+  }'</span></code></pre>
+        <div class="info-text">⟶ <code>checkType: 1</code> = KYC. Response: <strong>{ "checkId": "guid..." }</strong>. Save this GUID for the approve test.</div>
+      </div>
+    </div>
+
+    <!-- Step 25: Approve -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">25</div>
+        <h3>Test: Approve the Compliance Check</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">POST</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Replace {checkId} with the GUID from Step 24</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5004/api/compliance/checks/{checkId}/approve"</span> `
+  <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "checkId": "PASTE-CHECK-GUID-HERE",
+    "approvedBy": "Admin",
+    "notes": "KYC documents verified successfully"
+  }'</span></code></pre>
+        <div class="info-text">⟶ Response: <strong>200 OK</strong> with an empty body means it worked.</div>
+      </div>
+    </div>
+
+    <!-- Step 26: GET checks -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">26</div>
+        <h3>Test: Fetch compliance history for the customer</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">GET</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in the same terminal</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5004/api/compliance/checks/entity/CUST-001"</span></code></pre>
+        <div class="info-text">⟶ Returns an array. The check you created must show <strong>Status: Approved</strong>.</div>
+      </div>
+    </div>
+
+    <!-- Step 27: Get Products by tenant -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--phase-4);">27</div>
+        <h3>Test: List all active products for the tenant</h3>
+        <span class="tag" style="background:rgba(167,139,250,0.12);color:var(--phase-4);">GET</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Run in the same terminal</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5003/api/products/tenant/ATLSZA"</span></code></pre>
+        <div class="info-text">⟶ Must return the "AtlasBank Premium Savings" product created in Step 22.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ PHASE 5 ============================================================ -->
+  <div id="phase5">
+    <div class="phase-header">
+      <div class="phase-number" style="background:rgba(244,114,182,0.15); color:var(--phase-5);">5</div>
+      <div><h2 style="color:var(--phase-5)">Database Verification &amp; Audit Trail</h2><div class="phase-sub">Confirm every operation actually persisted correctly in PostgreSQL</div></div>
+    </div>
+
+    <!-- Step 28 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(244,114,182,0.15);color:var(--phase-5);">28</div>
+        <h3>Verify the Account row in PostgreSQL</h3>
+        <span class="tag" style="background:rgba(244,114,182,0.12);color:var(--phase-5);">SQL</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🗄️</span> Run directly inside the postgres container</div>
+        <pre><code><span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_accounts <span class="kw">-c</span> <span class="str">"SELECT Id, AccountNumber, CustomerId, Status, BalanceAmount FROM Accounts;"</span></code></pre>
+        <div class="info-text">⟶ Must show one row with <strong>CustomerId = CUST-001</strong> and a generated account number starting with <code>62</code>.</div>
+      </div>
+    </div>
+
+    <!-- Step 29 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(244,114,182,0.15);color:var(--phase-5);">29</div>
+        <h3>Verify the Transaction row</h3>
+        <span class="tag" style="background:rgba(244,114,182,0.12);color:var(--phase-5);">SQL</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🗄️</span> Transactions database</div>
+        <pre><code><span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_transactions <span class="kw">-c</span> <span class="str">"SELECT TransactionReference, Amount, Status, Description FROM Transactions;"</span></code></pre>
+        <div class="info-text">⟶ Shows the TXN reference, <strong>ZAR 5000.00</strong>, and status <code>Pending</code>.</div>
+      </div>
+    </div>
+
+    <!-- Step 30 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(244,114,182,0.15);color:var(--phase-5);">30</div>
+        <h3>Verify the Loan row</h3>
+        <span class="tag" style="background:rgba(244,114,182,0.12);color:var(--phase-5);">SQL</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🗄️</span> Products database</div>
+        <pre><code><span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_products <span class="kw">-c</span> <span class="str">"SELECT LoanNumber, PrincipalAmount, InterestRate, TermMonths, Status FROM Loans;"</span></code></pre>
+        <div class="info-text">⟶ Shows loan number starting with <code>LN</code>, principal <strong>50000.00</strong>, and a correctly calculated monthly payment.</div>
+      </div>
+    </div>
+
+    <!-- Step 31 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(244,114,182,0.15);color:var(--phase-5);">31</div>
+        <h3>Verify the Tenant &amp; User rows</h3>
+        <span class="tag" style="background:rgba(244,114,182,0.12);color:var(--phase-5);">SQL</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🗄️</span> Tenancy database</div>
+        <pre><code><span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_tenancy <span class="kw">-c</span> <span class="str">"SELECT TenantCode, Name, Status FROM Tenants;"</span>
+<span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_tenancy <span class="kw">-c</span> <span class="str">"SELECT Email, FirstName, Status FROM Users;"</span></code></pre>
+        <div class="info-text">⟶ Tenant code <strong>ATLSZA</strong> and user <strong>admin@atlasbank.com</strong> must both appear.</div>
+      </div>
+    </div>
+
+    <!-- Step 32 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(244,114,182,0.15);color:var(--phase-5);">32</div>
+        <h3>Verify the Compliance check status in DB</h3>
+        <span class="tag" style="background:rgba(244,114,182,0.12);color:var(--phase-5);">SQL</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🗄️</span> Compliance database</div>
+        <pre><code><span class="tag">docker</span> exec <span class="var">-it</span> postgres psql <span class="kw">-U</span> postgres <span class="kw">-d</span> atlasbank_compliance <span class="kw">-c</span> <span class="str">"SELECT EntityId, CheckType, Status, RiskScore, ReviewedBy FROM ComplianceChecks;"</span></code></pre>
+        <div class="info-text">⟶ Shows <strong>CUST-001</strong>, type <code>KYC</code>, status <strong>Approved</strong>, reviewed by <code>Admin</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ PHASE 6 ============================================================ -->
+  <div id="phase6">
+    <div class="phase-header">
+      <div class="phase-number" style="background:rgba(251,146,60,0.15); color:var(--phase-6);">6</div>
+      <div><h2 style="color:var(--phase-6)">Gateway &amp; Full Docker Deployment Test</h2><div class="phase-sub">Launch the API Gateway, then nuke everything and prove Docker Compose rebuilds it all</div></div>
+    </div>
+
+    <!-- Step 33 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(251,146,60,0.15);color:var(--phase-6);">33</div>
+        <h3>Launch the API Gateway</h3>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--phase-6);">Gateway</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🖥️</span> Terminal 6 — Gateway</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\AtlasBank-OS\gateway\AtlasBank.Gateway"</span>
+<span class="tag">dotnet</span> run <span class="kw">--project</span> .</code></pre>
+        <div class="info-text">⟶ Wait for <strong>Now listening on:</strong> to appear. The Gateway will route on <code>localhost:5000</code> (or whatever port it prints).</div>
+      </div>
+    </div>
+
+    <!-- Step 34 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(251,146,60,0.15);color:var(--phase-6);">34</div>
+        <h3>Test: Hit Tenancy through the Gateway</h3>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--phase-6);">GET</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Route: Gateway → Tenancy Service</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5000/tenancy/api/tenants"</span></code></pre>
+        <div class="info-text">⟶ Must return the tenant <strong>ATLSZA</strong> you created earlier. If it does, the Gateway is routing correctly.</div>
+      </div>
+    </div>
+
+    <!-- Step 35 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(251,146,60,0.15);color:var(--phase-6);">35</div>
+        <h3>Test: Hit Compliance through the Gateway</h3>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--phase-6);">GET</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Route: Gateway → Compliance Service</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5000/compliance/api/compliance/checks/entity/CUST-001"</span></code></pre>
+        <div class="info-text">⟶ Returns the compliance history for CUST-001 via the Gateway. Multi-service routing confirmed.</div>
+      </div>
+    </div>
+
+    <!-- Step 36 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(251,146,60,0.15);color:var(--phase-6);">36</div>
+        <h3>Stop all services cleanly</h3>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--phase-6);">Cleanup</span>
+      </div>
+      <div class="card-body">
+        <div class="info-text">Press <strong>Ctrl + C</strong> in each of the 6 service terminals to shut them down. Then stop Docker infra:</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\AtlasBank-OS\infra\docker"</span>
+<span class="tag">docker</span> compose <span class="kw">-f</span> docker-compose.yml <span class="kw">down</span></code></pre>
+      </div>
+    </div>
+
+    <!-- Step 37 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(251,146,60,0.15);color:var(--phase-6);">37</div>
+        <h3>Full Docker Prod Deployment — Build all images</h3>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--phase-6);">Docker</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🐳</span> Build all 6 Docker images from root</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\AtlasBank-OS"</span>
+<span class="tag">docker</span> build <span class="kw">-t</span> atlasbank/accounts-api:latest <span class="kw">-f</span> services/accounts/AtlasBank.Accounts.API/Dockerfile .
+<span class="tag">docker</span> build <span class="kw">-t</span> atlasbank/transactions-api:latest <span class="kw">-f</span> services/transactions/AtlasBank.Transactions.API/Dockerfile .
+<span class="tag">docker</span> build <span class="kw">-t</span> atlasbank/products-api:latest <span class="kw">-f</span> services/products/AtlasBank.Products.API/Dockerfile .
+<span class="tag">docker</span> build <span class="kw">-t</span> atlasbank/compliance-api:latest <span class="kw">-f</span> services/compliance/AtlasBank.Compliance.API/Dockerfile .
+<span class="tag">docker</span> build <span class="kw">-t</span> atlasbank/tenancy-api:latest <span class="kw">-f</span> services/tenancy/AtlasBank.Tenancy.API/Dockerfile .
+<span class="tag">docker</span> build <span class="kw">-t</span> atlasbank/gateway:latest <span class="kw">-f</span> gateway/AtlasBank.Gateway/Dockerfile .</code></pre>
+        <div class="info-text">⟶ Each build ends with <strong style="color:var(--accent2);">Successfully built</strong>. All 6 images must succeed.</div>
+      </div>
+    </div>
+
+    <!-- Step 38 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(251,146,60,0.15);color:var(--phase-6);">38</div>
+        <h3>Verify all images exist locally</h3>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--phase-6);">Docker</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> List your images</div>
+        <pre><code><span class="tag">docker</span> images <span class="kw">--filter</span> <span class="str">"dangling=false"</span> <span class="kw">--format</span> <span class="str">"table {{.Repository}}\t{{.Tag}}\t{{.Size}}"</span></code></pre>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Repository</th><th>Tag</th><th>Expected</th></tr></thead>
+            <tbody>
+              <tr><td>atlasbank/accounts-api</td><td>latest</td><td class="status-ok">✓ Present</td></tr>
+              <tr><td>atlasbank/transactions-api</td><td>latest</td><td class="status-ok">✓ Present</td></tr>
+              <tr><td>atlasbank/products-api</td><td>latest</td><td class="status-ok">✓ Present</td></tr>
+              <tr><td>atlasbank/compliance-api</td><td>latest</td><td class="status-ok">✓ Present</td></tr>
+              <tr><td>atlasbank/tenancy-api</td><td>latest</td><td class="status-ok">✓ Present</td></tr>
+              <tr><td>atlasbank/gateway</td><td>latest</td><td class="status-ok">✓ Present</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 39 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(251,146,60,0.15);color:var(--phase-6);">39</div>
+        <h3>Launch the full production stack with Docker Compose</h3>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--phase-6);">Docker</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">🐳</span> infra/docker/ — uses docker-compose.prod.yml</div>
+        <pre><code><span class="tag">cd</span> <span class="str">"..\AtlasBank-OS\infra\docker"</span>
+<span class="tag">docker</span> compose <span class="kw">-f</span> docker-compose.prod.yml <span class="kw">up</span> <span class="kw">--build</span></code></pre>
+        <div class="info-text">⟶ Watch the logs. All 10 containers (6 services + postgres + kafka + zookeeper + redis) must show <strong style="color:var(--accent2);">Up</strong>. This is your full prod environment running in one command.</div>
+        <div class="warning-box">
+          <span class="warn-icon">⚡</span>
+          <p>Leave the <code>--build</code> flag on. It forces a fresh rebuild using your Dockerfiles. First run takes 2–3 minutes as .NET layers are cached.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 40 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(251,146,60,0.15);color:var(--phase-6);">40</div>
+        <h3>Final smoke test — hit the Gateway in the Docker network</h3>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--phase-6);">Smoke</span>
+      </div>
+      <div class="card-body">
+        <div class="code-label"><span class="file-icon">💻</span> Open a new PowerShell terminal and run</div>
+        <pre><code><span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5000/tenancy/api/tenants"</span>
+<span class="tag">Invoke-RestMethod</span> <span class="kw">-Uri</span> <span class="str">"http://localhost:5001/api/accounts"</span> <span class="kw">-Method</span> POST `
+  <span class="kw">-ContentType</span> <span class="str">"application/json"</span> `
+  <span class="kw">-Body</span> <span class="str">'{
+    "customerId": "CUST-DOCKER-001",
+    "tenantId": "ATLSZA",
+    "productType": 2,
+    "interestRate": 5.0
+  }'</span></code></pre>
+        <div class="info-text">⟶ If both return <strong>200 OK</strong> with data, your entire AtlasBank OS is running end-to-end inside Docker. You're done.</div>
+      </div>
+    </div>
+
+    <!-- Quick Reference: All endpoints -->
+    <div class="card" style="margin-top:30px;">
+      <div class="card-header">
+        <div class="step-num" style="background:rgba(251,146,60,0.15);color:var(--phase-6);">📋</div>
+        <h3>Full Endpoint Quick Reference</h3>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--phase-6);">Reference</span>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Method</th><th>Endpoint</th><th>Service</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><span class="method method-post">POST</span></td><td class="url">/api/auth/register</td><td>Tenancy :5005</td><td>Create a new user</td></tr>
+              <tr><td><span class="method method-post">POST</span></td><td class="url">/api/auth/login</td><td>Tenancy :5005</td><td>Login &amp; get JWT</td></tr>
+              <tr><td><span class="method method-post">POST</span></td><td class="url">/api/tenants</td><td>Tenancy :5005</td><td>Create tenant</td></tr>
+              <tr><td><span class="method method-get">GET</span></td><td class="url">/api/tenants</td><td>Tenancy :5005</td><td>List all tenants</td></tr>
+              <tr><td><span class="method method-get">GET</span></td><td class="url">/api/tenants/{id}</td><td>Tenancy :5005</td><td>Get single tenant</td></tr>
+              <tr><td><span class="method method-post">POST</span></td><td class="url">/api/accounts</td><td>Accounts :5001</td><td>Open account</td></tr>
+              <tr><td><span class="method method-post">POST</span></td><td class="url">/api/transactions</td><td>Transactions :5002</td><td>Create transfer</td></tr>
+              <tr><td><span class="method method-post">POST</span></td><td class="url">/api/products</td><td>Products :5003</td><td>Create product</td></tr>
+              <tr><td><span class="method method-get">GET</span></td><td class="url">/api/products/{id}</td><td>Products :5003</td><td>Get product</td></tr>
+              <tr><td><span class="method method-get">GET</span></td><td class="url">/api/products/tenant/{id}</td><td>Products :5003</td><td>List by tenant</td></tr>
+              <tr><td><span class="method method-post">POST</span></td><td class="url">/api/products/loans</td><td>Products :5003</td><td>Apply for loan</td></tr>
+              <tr><td><span class="method method-post">POST</span></td><td class="url">/api/compliance/checks</td><td>Compliance :5004</td><td>Run compliance check</td></tr>
+              <tr><td><span class="method method-post">POST</span></td><td class="url">/api/compliance/checks/{id}/approve</td><td>Compliance :5004</td><td>Approve check</td></tr>
+              <tr><td><span class="method method-get">GET</span></td><td class="url">/api/compliance/checks/entity/{id}</td><td>Compliance :5004</td><td>Check history</td></tr>
+              <tr><td><span class="method method-get">GET</span></td><td class="url">/api/compliance/checks/pending</td><td>Compliance :5004</td><td>Pending checks</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL CARD -->
+  <div class="final-card">
+    <h2>🎯 AtlasBank OS — Fully Tested</h2>
+    <p>If every step above returned green, you have a live, fully functional core banking platform with 5 microservices, an API gateway, event streaming, compliance, multi-tenancy, and production Docker deployment. That's not a tutorial project — that's enterprise software.</p>
+    <div class="badges">
+      <span class="badge">✅ 5 Microservices Running</span>
+      <span class="badge">✅ PostgreSQL Persisted</span>
+      <span class="badge">✅ Kafka Connected</span>
+      <span class="badge">✅ Redis Alive</span>
+      <span class="badge">✅ JWT Auth Working</span>
+      <span class="badge">✅ Gateway Routing</span>
+      <span class="badge">✅ Docker Prod Stack</span>
+      <span class="badge">✅ Compliance Verified</span>
+      <span class="badge">✅ Loans Calculated</span>
+      <span class="badge">✅ Multi-Tenant Isolation</span>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</body>
+</html>
